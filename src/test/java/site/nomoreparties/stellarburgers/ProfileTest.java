@@ -1,51 +1,76 @@
 package site.nomoreparties.stellarburgers;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.WebDriverRunner;
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import site.nomoreparties.stellarburgers.pojo.MainPage;
+import site.nomoreparties.stellarburgers.pojo.UserData;
 
 import java.util.Random;
 
 public class ProfileTest extends BaseTest {
-    String name;
-    String email;
-    String password;
+    private String email;
+    private String password;
+    private UserData responseRegistration;
+
+    public String BASE_URL = "https://stellarburgers.nomoreparties.site/";
+    public String LOGIN_URL = "https://stellarburgers.nomoreparties.site/login";
+    public String PROFILE_URL = "https://stellarburgers.nomoreparties.site/account/profile";
 
     @Before
     public void createUser(){
-        name = new Random().nextInt(300) + "Mia";
-        email = new Random().nextInt(300) + "@ya.ru";
+        String name = new Random().nextInt(1000) + "Miia";
+        email = new Random().nextInt(1000) + "@ya.ru";
         password = "1q2w3e4r";
-        new MainPage()
-                .openMainPage()
-                .clickLogInButton()
-                .clickRegisterButton()
-                .setName(name)
-                .setEmail(email)
-                .setPassword(password)
-                .clickRegistrationButton();
+        UserData registration = new UserData(email, password, name, null, null, null, null, null);
+        responseRegistration = RestAssured.with()
+                .baseUri(BASE_URL)
+                .body(registration)
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .post("/api/auth/register")
+                .then()
+                .statusCode(200)
+                .extract().as(UserData.class);
+    }
+
+    @After
+    public void deleteUser() {
+        if(responseRegistration != null) {
+            String accessToken = responseRegistration.getAccessToken();
+            RestAssured.with()
+                    .header("Authorization", accessToken)
+                    .baseUri(BASE_URL)
+                    .accept(ContentType.JSON)
+                    .contentType(ContentType.JSON)
+                    .delete("/api/auth/user");
+        }
     }
 
     @Test
     @DisplayName("Переход по клику на «Личный кабинет»")
-    public void goToPersonalAccountTest() throws InterruptedException {
+    public void goToPersonalAccountTest() {
         new MainPage()
                 .openMainPage()
                 .clickLogInButton()
                 .enterEmail(email)
                 .enterPassword(password)
                 .clickEnterButton()
-                .clickPersonalAccountButton();
-        Thread.sleep(5000);
-        Assert.assertEquals("https://stellarburgers.nomoreparties.site/account/profile", WebDriverRunner.getWebDriver().getCurrentUrl());
+                .clickPersonalAccountButtonAfterLogIn()
+                .getExitButton()
+                .shouldBe(Condition.visible);
+        Assert.assertEquals(PROFILE_URL, WebDriverRunner.getWebDriver().getCurrentUrl());
     }
 
     @Test
     @DisplayName("Переход из личного кабинета по ссылке «Конструктор»")
-    public void clickConstructorFromPersonalAccountTest() throws InterruptedException {
+    public void clickConstructorFromPersonalAccountTest() {
         new MainPage()
                 .openMainPage()
                 .clickLogInButton()
@@ -53,14 +78,15 @@ public class ProfileTest extends BaseTest {
                 .enterPassword(password)
                 .clickEnterButton()
                 .clickPersonalAccountButtonAfterLogIn()
-                .clickConstructorButton();
-        Thread.sleep(5000);
-        Assert.assertEquals("https://stellarburgers.nomoreparties.site/", WebDriverRunner.getWebDriver().getCurrentUrl());
+                .clickConstructorButton()
+                .getCheckoutButton()
+                .shouldBe(Condition.visible);
+        Assert.assertEquals(BASE_URL, WebDriverRunner.getWebDriver().getCurrentUrl());
     }
 
     @Test
     @DisplayName("Переход из личного кабинета по клику на логотип")
-    public void clickLogoFromPersonalAccountTest() throws InterruptedException {
+    public void clickLogoFromPersonalAccountTest() {
         new MainPage()
                 .openMainPage()
                 .clickLogInButton()
@@ -68,14 +94,15 @@ public class ProfileTest extends BaseTest {
                 .enterPassword(password)
                 .clickEnterButton()
                 .clickPersonalAccountButtonAfterLogIn()
-                .clickLogo();
-        Thread.sleep(5000);
-        Assert.assertEquals("https://stellarburgers.nomoreparties.site/", WebDriverRunner.getWebDriver().getCurrentUrl());
+                .clickLogo()
+                .getCheckoutButton()
+                .shouldBe(Condition.visible);
+        Assert.assertEquals(BASE_URL, WebDriverRunner.getWebDriver().getCurrentUrl());
     }
 
     @Test
     @DisplayName("Переход из личного кабинета по клику на Выйти")
-    public void clickExitFromPersonalAccountTest() throws InterruptedException {
+    public void clickExitFromPersonalAccountTest() {
         new MainPage()
                 .openMainPage()
                 .clickLogInButton()
@@ -83,8 +110,9 @@ public class ProfileTest extends BaseTest {
                 .enterPassword(password)
                 .clickEnterButton()
                 .clickPersonalAccountButtonAfterLogIn()
-                .clickExitButton();
-        Thread.sleep(5000);
-        Assert.assertEquals("https://stellarburgers.nomoreparties.site/login", WebDriverRunner.getWebDriver().getCurrentUrl());
+                .clickExitButton()
+                .getEnterButton()
+                .shouldBe(Condition.visible);
+        Assert.assertEquals(LOGIN_URL, WebDriverRunner.getWebDriver().getCurrentUrl());
     }
 }

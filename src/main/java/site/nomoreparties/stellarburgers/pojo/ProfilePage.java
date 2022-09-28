@@ -1,25 +1,34 @@
 package site.nomoreparties.stellarburgers.pojo;
 
+import com.codeborne.selenide.SelenideElement;
+
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.$;
 
 public class ProfilePage {
-    public ProfilePage() {
-    }
+
     //ссылка на конструктор
-    public void clickConstructorButton(){
-        $(byXpath("//*[@id=\"root\"]/div/header/nav/ul/li[1]/a/p")).click();
+    private final SelenideElement constructorButton = $(byXpath("//*[@id=\"root\"]/div/header/nav/ul/li[1]/a/p"));
+    public MainPage clickConstructorButton(){
+        constructorButton.click();
+        return new MainPage();
     }
 
     //логотип
+    private final SelenideElement logo = $(byAttribute("href", "/"));
     public MainPage clickLogo(){
-        $(byAttribute("href", "/")).click();
+        logo.click();
         return new MainPage();
     }
 
     //кнопка Выйти
+    private final SelenideElement exitButton = $(byTagAndText("button", "Выход"));
     public LogInPage clickExitButton(){
-        $(byTagAndText("button", "Выход")).click();
+        exitButton.click();
         return new LogInPage();
+    }
+
+    public SelenideElement getExitButton(){
+        return exitButton;
     }
 }

@@ -1,5 +1,6 @@
 package site.nomoreparties.stellarburgers;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.WebDriverRunner;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Assert;
@@ -11,18 +12,19 @@ import java.util.Random;
 
 public class RegistrationTest extends BaseTest{
 
-    String name;
-    String email;
+    private String name;
+    private String email;
+    public String LOGIN_URL = "https://stellarburgers.nomoreparties.site/login";
 
     @Before
     public void generateUserData(){
-        name = new Random().nextInt(300) + "Mia";
-        email = new Random().nextInt(300) + "@ya.ru";
+        name = new Random().nextInt(500) + "Miaa";
+        email = new Random().nextInt(500) + "@ya.ru";
     }
 
     @Test
     @DisplayName("Регистрация с использованием валидных данных")
-    public void registrationWithValidDataTest() throws InterruptedException {
+    public void registrationWithValidDataTest() {
         new MainPage()
                 .openMainPage()
                 .clickLogInButton()
@@ -30,14 +32,15 @@ public class RegistrationTest extends BaseTest{
                 .setName(name)
                 .setEmail(email)
                 .setPassword("1q2w3e4r")
-                .clickRegistrationButton();
-        Thread.sleep(5000);
-        Assert.assertEquals("https://stellarburgers.nomoreparties.site/login", WebDriverRunner.getWebDriver().getCurrentUrl());
+                .clickRegistrationButton()
+                .getEnterButton()
+                .shouldBe(Condition.visible);
+        Assert.assertEquals(LOGIN_URL, WebDriverRunner.getWebDriver().getCurrentUrl());
     }
 
     @Test
     @DisplayName("Регистрация с вводом некорректного пароля")
-    public void registrationWithInvalidPasswordTest() throws InterruptedException {
+    public void registrationWithInvalidPasswordTest() {
         new MainPage()
                 .openMainPage()
                 .clickLogInButton()
@@ -45,8 +48,9 @@ public class RegistrationTest extends BaseTest{
                 .setName(name)
                 .setEmail(email)
                 .setPassword("1q2")
-                .clickRegistrationButton();
-        Thread.sleep(5000);
+                .clickRegistrationButtonWithInvalidPassword()
+                .getInvalidPasswordMessage()
+                .shouldBe(Condition.visible);
         Assert.assertEquals("Некорректный пароль", new RegistrationPage().getInvalidPasswordMessage().getText());
     }
 }

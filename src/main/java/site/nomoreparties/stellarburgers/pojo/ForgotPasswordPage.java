@@ -1,16 +1,17 @@
 package site.nomoreparties.stellarburgers.pojo;
 
+import com.codeborne.selenide.SelenideElement;
+
 import static com.codeborne.selenide.Selectors.byAttribute;
 import static com.codeborne.selenide.Selectors.byXpath;
 import static com.codeborne.selenide.Selenide.$;
 
 public class ForgotPasswordPage {
-    public ForgotPasswordPage() {
-    }
 
     //кнопка Войти
+    private final SelenideElement enterButton = $(byAttribute("href", "/login"));
     public LogInPage clickEnterButton(){
-        $(byAttribute("href", "/login")).click();
+        enterButton.click();
         return new LogInPage();
     }
 }
