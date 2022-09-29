@@ -1,6 +1,5 @@
 package site.nomoreparties.stellarburgers;
 
-import com.codeborne.selenide.Condition;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,35 +9,39 @@ public class MainPageTest {
 
     @Test
     @DisplayName("Проверка, что работает переход к разделу Булки")
-    public void clickBunsTabTest() throws InterruptedException {
-        new MainPage()
+    public void clickBunsTabTest() {
+        Assert.assertTrue(
+                new MainPage()
                 .openMainPage()
                 .clickSousesTab()
                 .clickBunsTab()
-                .getBunsHeader()
-                .shouldBe(Condition.visible);
-        Assert.assertEquals("Булки", new MainPage().getBunsHeader().getText());
+                .getActiveTab()
+                .innerHtml()
+                .contains("Булки"));
     }
 
     @Test
     @DisplayName("Проверка, что работает переход к разделу Соусы")
-    public void clickSousesTabTest() throws InterruptedException {
-        new MainPage()
+    public void clickSousesTabTest() {
+        Assert.assertTrue(
+                new MainPage()
                 .openMainPage()
                 .clickSousesTab()
-                .getSousesHeader()
-                .shouldBe(Condition.visible);
-        Assert.assertEquals("Соусы", new MainPage().getSousesHeader().getText());
+                .getActiveTab()
+                .innerHtml()
+                .contains("Соусы"));
     }
 
     @Test
     @DisplayName("Проверка, что работает переход к разделу Начинки")
-    public void clickFillingsTabTest() throws InterruptedException {
+    public void clickFillingsTabTest() {
         Assert.assertTrue(
                 new MainPage()
-                .openMainPage()
-                .getFillingsHeader()
-                .scrollTo()
-                .isDisplayed());
+                        .openMainPage()
+                        .clickFillingsTab()
+                        .getActiveTab()
+                        .innerHtml()
+                        .contains("Начинки"));
+        }
     }
-}
+

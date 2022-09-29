@@ -1,11 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: site.nomoreparties.stellarburgers.LogInTest
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 21.886 s <<< FAILURE! - in site.nomoreparties.stellarburgers.LogInTest
-logInByPersonalAccountButtonTest(site.nomoreparties.stellarburgers.LogInTest)  Time elapsed: 1.47 s  <<< FAILURE!
-java.lang.AssertionError: 
-1 expectation failed.
-Expected status code <200> but was <403>.
-
-	at site.nomoreparties.stellarburgers.LogInTest.createUser(LogInTest.java:35)
-
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 34.689 s - in site.nomoreparties.stellarburgers.LogInTest
